@@ -74,10 +74,17 @@ def DoMove(self, move):
         Must update playerJustMoved.
     """
     # get highest random
-    ss = [[p, np.random.randint(p.low, p.high + 1, 1)[0]] for p in self.freeagents if p.position == move][:5]
+    try:
+        ss = [[p, np.random.randint(p.low, p.high + 1, 1)[0]] for p in self.freeagents if p.position == move]
+        if len(ss) >= 15:
+            ss = ss[:15]
+        else:
+            ss = ss[:5]
 
-    ss = sorted(ss, key=lambda x: x[1], reverse=True)
-    player = next(p[0] for p in ss)
+        ss = sorted(ss, key=lambda x: x[1], reverse=True)
+        player = next(p[0] for p in ss)
+    except:
+        player = None
     self.freeagents.remove(player)
     rosterId = self.turns.pop(0)
     self.rosters[rosterId].append(player)

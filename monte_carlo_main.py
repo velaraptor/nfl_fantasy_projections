@@ -6,9 +6,13 @@ import numpy as np
 
 def main():
     nfl_players = pd.read_csv('all_predictions.csv')
+
+    nfl_players['diff'] = nfl_players['high'] -  nfl_players['low']
+    nfl_players = nfl_players[nfl_players['diff'] < 312.2].reset_index(drop=True)
+
     nfl_players['mean_prediction'] = nfl_players.apply(lambda x: np.mean(x[['low', 'point', 'prediction']]), axis=1)
     nfl_players = nfl_players[['Name', 'FantPos', 'mean_prediction', 'high', 'low']]
-    nfl_players = nfl_players[nfl_players.mean_prediction > 85].reset_index(drop=True)
+    nfl_players = nfl_players[nfl_players.mean_prediction > 55].reset_index(drop=True)
     nfl_players = nfl_players.sort_values('mean_prediction', ascending=False)
     freeagents = [NflPlayer(*p) for p in nfl_players.itertuples(index=False, name=None)]
     num_competitors = 12
