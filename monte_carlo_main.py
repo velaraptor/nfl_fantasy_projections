@@ -8,7 +8,7 @@ def main():
     nfl_players = pd.read_csv('all_predictions.csv')
     nfl_players['mean_prediction'] = nfl_players.apply(lambda x: np.mean(x[['low', 'point', 'prediction']]), axis=1)
     nfl_players = nfl_players[['Name', 'FantPos', 'mean_prediction', 'high', 'low']]
-    nfl_players = nfl_players[nfl_players.mean_prediction > 75].reset_index(drop=True)
+    nfl_players = nfl_players[nfl_players.mean_prediction > 85].reset_index(drop=True)
     nfl_players = nfl_players.sort_values('mean_prediction', ascending=False)
     freeagents = [NflPlayer(*p) for p in nfl_players.itertuples(index=False, name=None)]
     num_competitors = 12
@@ -26,7 +26,7 @@ def main():
     DraftState.Clone = Clone
 
     state = DraftState(rosters, turns, freeagents)
-    iterations = 100000
+    iterations = 30000
     while state.GetMoves() != []:
         move = UCT(state, iterations)
         state.DoMove(move)
