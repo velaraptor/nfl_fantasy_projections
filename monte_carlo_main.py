@@ -14,7 +14,7 @@ def main():
     num_competitors = 12
     rosters = [[] for _ in range(num_competitors)]  # empty rosters to start with
 
-    num_rounds = 15
+    num_rounds = 12
     turns = []
     # generate turns by snake order
     for i in range(num_rounds):
@@ -26,7 +26,7 @@ def main():
     DraftState.Clone = Clone
 
     state = DraftState(rosters, turns, freeagents)
-    iterations = 30000
+    iterations = 9000
     while state.GetMoves() != []:
         move = UCT(state, iterations)
         state.DoMove(move)

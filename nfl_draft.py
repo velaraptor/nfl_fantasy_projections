@@ -68,23 +68,15 @@ def GetMoves(self):
     return moves
 
 
-def Sort(sub_li):
-    l = len(sub_li)
-    for i in range(0, l):
-        for j in range(0, l-i-1):
-            if (sub_li[j][1] > sub_li[j + 1][1]):
-                tempo = sub_li[j]
-                sub_li[j]= sub_li[j + 1]
-                sub_li[j + 1]= tempo
-    return sub_li
 
 def DoMove(self, move):
     """ Update a state by carrying out the given move.
         Must update playerJustMoved.
     """
     # get highest random
-    ss = Sort([[p, np.random.randint(p.low, p.high + 1, 1)[0]] for p in self.freeagents if p.position == move])
-    ss = list(reversed(ss))
+    ss = [[p, np.random.randint(p.low, p.high + 1, 1)[0]] for p in self.freeagents if p.position == move][:5]
+
+    ss = sorted(ss, key=lambda x: x[1], reverse=True)
     player = next(p[0] for p in ss)
     self.freeagents.remove(player)
     rosterId = self.turns.pop(0)
