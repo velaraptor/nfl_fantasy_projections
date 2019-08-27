@@ -31,7 +31,7 @@ def GetResult(self, playerjm):
         ("WR"): [.5, .5, .5, .5],
         ("RB"): [.5, .5, .5, .5],
         ("TE"): [.02],
-        ("RB", "WR", 'WR'): [.5, .5]
+        ("RB", "WR", 'TE'): [.5, .5, 0.2]
     }
 
     result = 0
@@ -59,7 +59,7 @@ def GetResult(self, playerjm):
 def GetMoves(self):
     """ Get all possible moves from this state.
     """
-    pos_max = {"QB": 2, "WR": 6, "RB": 6, "TE": 1}
+    pos_max = {"QB": 2, "WR": 6, "RB": 6, "TE": 2}
 
     if len(self.turns) == 0: return []
 
@@ -68,6 +68,12 @@ def GetMoves(self):
     return moves
 
 
+def DoMoveDraft(self, player):
+    player = [p for p in self.freeagents if p.name == player][0]
+    self.freeagents.remove(player)
+    rosterId = self.turns.pop(0)
+    self.rosters[rosterId].append(player)
+    self.playerJustMoved = rosterId
 
 def DoMove(self, move):
     """ Update a state by carrying out the given move.

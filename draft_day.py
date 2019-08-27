@@ -1,4 +1,4 @@
-from nfl_draft import DraftState, NflPlayer, GetMoves, GetResult, DoMove, Clone
+from nfl_draft import DraftState, NflPlayer, GetMoves, GetResult, DoMove, Clone, DoMoveDraft
 from monte_carlo import UCT
 import pandas as pd
 import numpy as np
@@ -32,9 +32,11 @@ def main():
     DraftState.GetMoves = GetMoves
     DraftState.DoMove = DoMove
     DraftState.Clone = Clone
+    DraftState.DoMoveDraft = DoMoveDraft
 
     state = DraftState(rosters, turns, freeagents)
-    iterations = 500
+    iterations = 15
+    state.DoMoveDraft('Saquon Barkley')
     while state.GetMoves() != []:
         move = UCT(state, iterations)
         state.DoMove(move)
