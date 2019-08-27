@@ -6,13 +6,17 @@ import numpy as np
 
 def main():
     nfl_players = pd.read_csv('all_predictions.csv')
-
-    nfl_players['diff'] = nfl_players['high'] -  nfl_players['low']
+    espn = pd.read_csv('espn_projections.csv')
+    espn['name'] = espn['name'].astype(str)
+    nfl_players['Name'] = nfl_players.Name.astype(str)
+    nfl_players['diff'] = nfl_players['high'] - nfl_players['low']
+    nfl_players = nfl_players.merge(espn, left_on='Name', right_on='name', how='left').dropna(axis=0)
     nfl_players = nfl_players[nfl_players['diff'] < 312.2].reset_index(drop=True)
 
     nfl_players['mean_prediction'] = nfl_players.apply(lambda x: np.mean(x[['low', 'point', 'prediction']]), axis=1)
-    nfl_players = nfl_players[['Name', 'FantPos', 'mean_prediction', 'high', 'low']]
-    nfl_players = nfl_players[nfl_players.mean_prediction > 55].reset_index(drop=True)
+    nfl_players['mean_prediction'] = (nfl_players['mean_prediction'] + 1.15 * nfl_players['espn_projection'])/2
+    nfl_players = nfl_players[['Name', 'pos', 'mean_prediction', 'high', 'low']]
+    nfl_players = nfl_players[nfl_players.mean_prediction > 20].reset_index(drop=True)
     nfl_players = nfl_players.sort_values('mean_prediction', ascending=False)
     freeagents = [NflPlayer(*p) for p in nfl_players.itertuples(index=False, name=None)]
     num_competitors = 12
@@ -30,7 +34,7 @@ def main():
     DraftState.Clone = Clone
 
     state = DraftState(rosters, turns, freeagents)
-    iterations = 9000
+    iterations = 100
     while state.GetMoves() != []:
         move = UCT(state, iterations)
         state.DoMove(move)
@@ -43,7 +47,7 @@ def main():
         t = one_team.astype(str).str.split('|', expand=True)
         print({i + 1: np.sum(t[2].astype(float))})
 
-    final_rosters.to_csv('final_rosters.csv')
+    final_rosters.to_csv('final_rosters_espn.csv')
     return final_rosters
 
 

@@ -27,11 +27,11 @@ def GetResult(self, playerjm):
     if playerjm is None: return 0
 
     pos_wgts = {
-        ("QB"): [.5],
+        ("QB"): [.5, .5],
         ("WR"): [.5, .5, .5, .5],
         ("RB"): [.5, .5, .5, .5],
-        ("TE"): [.5, .5],
-        ("RB", "WR", "TE"): [.5, .5, .5]
+        ("TE"): [.02],
+        ("RB", "WR", 'WR'): [.5, .5]
     }
 
     result = 0
@@ -59,7 +59,7 @@ def GetResult(self, playerjm):
 def GetMoves(self):
     """ Get all possible moves from this state.
     """
-    pos_max = {"QB": 1, "WR": 6, "RB": 6, "TE": 2}
+    pos_max = {"QB": 2, "WR": 6, "RB": 6, "TE": 1}
 
     if len(self.turns) == 0: return []
 
@@ -74,12 +74,19 @@ def DoMove(self, move):
         Must update playerJustMoved.
     """
     # get highest random
+    def random_sample(p):
+        v = []
+        for i in np.arange(0, 25):
+            v.append(np.random.randint(p.low, p.high+1, 1)[0])
+        random_dist = np.abs(np.random.normal(p.points, (p.high - p.low) / 4))
+        return (np.mean(v) + p.points + random_dist + p.high - p.low) / 4
+
     try:
-        ss = [[p, np.random.randint(p.low, p.high + 1, 1)[0]] for p in self.freeagents if p.position == move]
-        if len(ss) >= 15:
-            ss = ss[:15]
-        else:
+        ss = [[p, random_sample(p)] for p in self.freeagents if p.position == move]
+        if len(ss) >= 5:
             ss = ss[:5]
+        else:
+            ss = ss[:3]
 
         ss = sorted(ss, key=lambda x: x[1], reverse=True)
         player = next(p[0] for p in ss)
